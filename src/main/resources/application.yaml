@@ -1,5 +1,10 @@
 spring:
   application:
     name: todo-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/todo_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
 server:
   port: 3001
