@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class UserEntity {
-    private int id;
+    private Long id;
     private String name;
     private String email;
 }
