@@ -2,7 +2,7 @@ package br.com.samuellna.todo_api.service;
 
 import br.com.samuellna.todo_api.database.model.UserEntity;
 import br.com.samuellna.todo_api.database.repository.UserRepository;
-import br.com.samuellna.todo_api.dto.user.CreateUserDto;
+import br.com.samuellna.todo_api.dto.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public UserEntity create(CreateUserDto userDto) {
+    public UserEntity create(UserDto userDto) {
         UserEntity user = new UserEntity(
             null,
             userDto.getName(),
@@ -32,5 +32,20 @@ public class UserService {
         Long id = userRepository.create(user);
         user.setId(id);
         return user;
+    }
+
+    public String update(Long id, UserDto userDto) {
+        Optional<UserEntity> user = this.findById(id);
+
+        if(user.isEmpty()) return null;
+        if(userDto.getName() != null) {
+            user.get().setName(userDto.getName());
+        }
+        if(userDto.getEmail() != null) {
+            user.get().setEmail(userDto.getEmail());
+        }
+
+        userRepository.update(id, userDto);
+        return "Usuário atualizado";
     }
 }
