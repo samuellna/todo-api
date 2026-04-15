@@ -1,15 +1,15 @@
 package br.com.samuellna.todo_api.controller;
 
 import br.com.samuellna.todo_api.database.model.UserEntity;
-import br.com.samuellna.todo_api.dto.user.CreateUserDto;
+import br.com.samuellna.todo_api.dto.user.UserDto;
 import br.com.samuellna.todo_api.service.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/v1/user")
@@ -24,13 +24,26 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<String> getUserById(@PathVariable("id") String id) {
-        return ResponseEntity.ok("Oi " + id + "!");
+    public ResponseEntity<UserEntity> findById(@PathVariable("id") Long id) {
+        Optional<UserEntity> user = userService.findById(id);
+        if(user.isEmpty()) {
+            return new ResponseEntity<UserEntity>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<UserEntity>(user.get(), HttpStatus.FOUND);
     }
 
     @PostMapping
-    public ResponseEntity<UserEntity> create(@RequestBody CreateUserDto userDto) {
+    public ResponseEntity<UserEntity> create(@RequestBody UserDto userDto) {
         UserEntity user = userService.create(userDto);
         return new ResponseEntity<UserEntity>(user, HttpStatus.CREATED);
+    }
+
+    @PatchMapping(value = "/{id}")
+    public ResponseEntity<String> update(
+        @PathVariable("id") Long id,
+        @RequestBody UserDto userDto
+    ) {
+        String msg = userService.update(id, userDto);
+        return new ResponseEntity<String>(msg, HttpStatus.OK);
     }
 }
