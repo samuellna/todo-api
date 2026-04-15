@@ -1,10 +1,12 @@
 package br.com.samuellna.todo_api.database.repository;
 
 import br.com.samuellna.todo_api.database.model.UserEntity;
+import br.com.samuellna.todo_api.dto.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,5 +46,29 @@ public class UserRepository {
             ),
         id);
         return user.stream().findFirst();
+    }
+
+    public void update(Long id, UserDto userDto) {
+        List<Object> params = new ArrayList<>();
+        StringBuilder sqlQuery = new StringBuilder("UPDATE users SET ");
+        if(userDto.getName() != null) {
+            sqlQuery.append("name = ?");
+            params.add(userDto.getName());
+        }
+
+        if(userDto.getEmail() != null) {
+            sqlQuery.append(", email = ?");
+            params.add(userDto.getEmail());
+        }
+
+        if(params.isEmpty()) return;
+
+        sqlQuery.append(" WHERE id = ?");
+        params.add(id);
+
+        jdbcTemplate.update(
+            sqlQuery.toString(),
+            params.toArray()
+        );
     }
 }
