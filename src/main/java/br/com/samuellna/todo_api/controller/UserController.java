@@ -26,24 +26,31 @@ public class UserController {
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserEntity> findById(@PathVariable("id") Long id) {
         Optional<UserEntity> user = userService.findById(id);
-        if(user.isEmpty()) {
-            return new ResponseEntity<UserEntity>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<UserEntity>(user.get(), HttpStatus.FOUND);
+        return user
+                .map(userEntity -> new ResponseEntity<>(userEntity, HttpStatus.FOUND))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
     public ResponseEntity<UserEntity> create(@RequestBody UserDto userDto) {
         UserEntity user = userService.create(userDto);
-        return new ResponseEntity<UserEntity>(user, HttpStatus.CREATED);
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<String> update(
+    public ResponseEntity<UserEntity> update(
         @PathVariable("id") Long id,
         @RequestBody UserDto userDto
     ) {
-        String msg = userService.update(id, userDto);
-        return new ResponseEntity<String>(msg, HttpStatus.OK);
+        Optional<UserEntity> user = userService.update(id, userDto);
+        return user
+                .map(userEntity -> new ResponseEntity<>(userEntity, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<String> delete(@PathVariable("id") Long id) {
+        userService.delete(id);
+        return new ResponseEntity<>("Usuário removido.", HttpStatus.OK);
     }
 }
