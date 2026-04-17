@@ -1,9 +1,8 @@
-package br.com.samuellna.todo_api.dto.user;
+package br.com.samuellna.todo_api.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-
 
 @Getter
 @Setter
@@ -15,5 +14,6 @@ public class UserDto {
     private String name;
 
     @Email(message = "Email inválido")
+    @NotBlank(message = "O email é obrigatório")
     private String email;
 }

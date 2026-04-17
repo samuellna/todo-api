@@ -1,8 +1,10 @@
 package br.com.samuellna.todo_api.controller;
 
 import br.com.samuellna.todo_api.database.model.UserEntity;
-import br.com.samuellna.todo_api.dto.user.UserDto;
+import br.com.samuellna.todo_api.dto.UpdateUserDto;
+import br.com.samuellna.todo_api.dto.UserDto;
 import br.com.samuellna.todo_api.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserEntity> create(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserEntity> create(@RequestBody @Valid UserDto userDto) {
         UserEntity user = userService.create(userDto);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
@@ -40,7 +42,7 @@ public class UserController {
     @PatchMapping(value = "/{id}")
     public ResponseEntity<UserEntity> update(
         @PathVariable("id") Long id,
-        @RequestBody UserDto userDto
+        @RequestBody @Valid UpdateUserDto userDto
     ) {
         Optional<UserEntity> user = userService.update(id, userDto);
         return user
