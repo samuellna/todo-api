@@ -1,5 +1,7 @@
 package br.com.samuellna.todo_api.dto.user;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 
@@ -9,6 +11,9 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class UserDto {
+    @NotBlank(message = "O nome é obrigatório")
     private String name;
+
+    @Email(message = "Email inválido")
     private String email;
 }
