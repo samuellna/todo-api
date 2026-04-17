@@ -3,6 +3,7 @@ package br.com.samuellna.todo_api.database.model;
 import br.com.samuellna.todo_api.utils.StatusTask;
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Getter
@@ -12,9 +13,9 @@ import java.util.Date;
 @ToString
 
 public class TaskEntity {
-    private int id;
+    private Long id;
     private String title;
     private String description;
     private StatusTask status;
-    private Date createdAt;
+    private Timestamp createdAt;
 }
