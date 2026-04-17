@@ -34,18 +34,20 @@ public class UserService {
         return user;
     }
 
-    public String update(Long id, UserDto userDto) {
-        Optional<UserEntity> user = this.findById(id);
+    public Optional<UserEntity> update(Long id, UserDto userDto) {
+        // Checks if the body is empty
+        if(userDto.getEmail() == null && userDto.getName() == null) return Optional.empty();
 
-        if(user.isEmpty()) return null;
-        if(userDto.getName() != null) {
-            user.get().setName(userDto.getName());
-        }
-        if(userDto.getEmail() != null) {
-            user.get().setEmail(userDto.getEmail());
-        }
+        Optional<UserEntity> user = this.findById(id);
+        if(user.isEmpty()) return Optional.empty(); // The user doesn't exist in the database.
 
         userRepository.update(id, userDto);
-        return "Usuário atualizado";
+        return this.findById(id);
+    }
+
+    public void delete(Long id) {
+        Optional<UserEntity> user = this.findById(id);
+        if(user.isEmpty()) return; // The user doesn't exist in the database.
+        userRepository.delete(id);
     }
 }
