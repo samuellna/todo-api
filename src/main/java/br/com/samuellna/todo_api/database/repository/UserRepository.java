@@ -1,7 +1,8 @@
 package br.com.samuellna.todo_api.database.repository;
 
 import br.com.samuellna.todo_api.database.model.UserEntity;
-import br.com.samuellna.todo_api.dto.user.UserDto;
+import br.com.samuellna.todo_api.dto.UpdateUserDto;
+import br.com.samuellna.todo_api.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -26,7 +27,7 @@ public class UserRepository {
         );
     }
 
-    public Long create(UserEntity user) {
+    public Long create(UserDto user) {
         String sqlQuery = "INSERT INTO users (name, email) VALUES (?, ?) RETURNING id";
         return jdbcTemplate.queryForObject(
             sqlQuery,
@@ -48,7 +49,7 @@ public class UserRepository {
         return user.stream().findFirst();
     }
 
-    public void update(Long id, UserDto userDto) {
+    public void update(Long id, UpdateUserDto userDto) {
         List<Object> params = new ArrayList<>();
         StringBuilder sqlQuery = new StringBuilder("UPDATE users SET ");
         if(userDto.getName() != null) {
@@ -64,8 +65,8 @@ public class UserRepository {
         if(params.isEmpty()) return;
 
         sqlQuery.append(" WHERE id = ?");
+        if(params.size() == 1 && params.get(0) == userDto.getEmail()) sqlQuery.delete(17, 18); // removes the comma
         params.add(id);
-
         jdbcTemplate.update(
             sqlQuery.toString(),
             params.toArray()
