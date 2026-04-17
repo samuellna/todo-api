@@ -2,7 +2,8 @@ package br.com.samuellna.todo_api.service;
 
 import br.com.samuellna.todo_api.database.model.UserEntity;
 import br.com.samuellna.todo_api.database.repository.UserRepository;
-import br.com.samuellna.todo_api.dto.user.UserDto;
+import br.com.samuellna.todo_api.dto.UpdateUserDto;
+import br.com.samuellna.todo_api.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,18 +24,15 @@ public class UserService {
     }
 
     public UserEntity create(UserDto userDto) {
-        UserEntity user = new UserEntity(
-            null,
+        Long id = userRepository.create(userDto);
+        return new UserEntity(
+            id,
             userDto.getName(),
             userDto.getEmail()
         );
-
-        Long id = userRepository.create(user);
-        user.setId(id);
-        return user;
     }
 
-    public Optional<UserEntity> update(Long id, UserDto userDto) {
+    public Optional<UserEntity> update(Long id, UpdateUserDto userDto) {
         // Checks if the body is empty
         if(userDto.getEmail() == null && userDto.getName() == null) return Optional.empty();
 
