@@ -2,9 +2,7 @@ package br.com.samuellna.todo_api.database.model;
 
 import br.com.samuellna.todo_api.utils.StatusTask;
 import lombok.*;
-
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Getter
 @Setter
