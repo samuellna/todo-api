@@ -1,4 +1,4 @@
-package br.com.samuellna.todo_api.dto;
+package br.com.samuellna.todo_api.dto.task;
 import br.com.samuellna.todo_api.utils.StatusTask;
 import lombok.*;
 
