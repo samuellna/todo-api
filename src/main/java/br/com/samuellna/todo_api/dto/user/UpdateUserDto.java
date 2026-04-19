@@ -1,4 +1,4 @@
-package br.com.samuellna.todo_api.dto;
+package br.com.samuellna.todo_api.dto.user;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 
