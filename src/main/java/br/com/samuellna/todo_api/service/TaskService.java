@@ -1,9 +1,12 @@
 package br.com.samuellna.todo_api.service;
 
 import br.com.samuellna.todo_api.database.model.TaskEntity;
+import br.com.samuellna.todo_api.database.model.UserEntity;
 import br.com.samuellna.todo_api.database.repository.TaskRepository;
-import br.com.samuellna.todo_api.dto.TaskDto;
-import br.com.samuellna.todo_api.dto.UpdateTaskDto;
+import br.com.samuellna.todo_api.database.repository.UserRepository;
+import br.com.samuellna.todo_api.dto.task.ResponseTaskDto;
+import br.com.samuellna.todo_api.dto.task.TaskDto;
+import br.com.samuellna.todo_api.dto.task.UpdateTaskDto;
 import br.com.samuellna.todo_api.utils.StatusTask;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,10 +20,25 @@ import java.util.Optional;
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
     public List<TaskEntity> findAll() { return taskRepository.findAll(); }
 
-    public Optional<TaskEntity> findById(Long id) { return taskRepository.findById(id); }
+    public Optional<ResponseTaskDto> findById(Long id) {
+        Optional<TaskEntity> task = taskRepository.findById(id);
+        if(task.isEmpty()) return Optional.empty();
+        Optional<UserEntity> user = userRepository.findById(task.get().getUserId());
+        return user.map(userEntity -> new ResponseTaskDto(
+            id,
+            task.get().getTitle(),
+            task.get().getDescription(),
+            task.get().getStatus(),
+            task.get().getCreatedAt(),
+            userEntity
+        ));
+    }
+
+    public List<TaskEntity> findByUserId(Long id) { return taskRepository.findByUserId(id); }
 
     public TaskEntity create(TaskDto taskDto) {
         Long id = taskRepository.create(taskDto);
@@ -28,17 +46,18 @@ public class TaskService {
             id,
             taskDto.getTitle(),
             taskDto.getDescription(),
-            StatusTask.NOT_STARTED,
-            Timestamp.valueOf(LocalDateTime.now())
+            StatusTask.PENDING,
+            Timestamp.valueOf(LocalDateTime.now()),
+            taskDto.getUserId()
         );
     }
 
-    public Optional<TaskEntity> update(Long id, UpdateTaskDto taskDto) {
+    public Optional<ResponseTaskDto> update(Long id, UpdateTaskDto taskDto) {
         if(taskDto.getDescription() == null
             && taskDto.getTitle() == null
             && taskDto.getStatus() == null) return Optional.empty();
 
-        Optional<TaskEntity> task = this.findById(id);
+        Optional<ResponseTaskDto> task = this.findById(id);
         if(task.isEmpty()) return Optional.empty();
 
         taskRepository.update(id, taskDto);
@@ -46,7 +65,7 @@ public class TaskService {
     }
 
     public void delete(Long id) {
-        Optional<TaskEntity> task = this.findById(id);
+        Optional<ResponseTaskDto> task = this.findById(id);
         if(task.isEmpty()) return;
         taskRepository.delete(id);
     }
