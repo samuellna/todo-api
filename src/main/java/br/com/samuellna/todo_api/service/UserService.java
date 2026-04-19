@@ -7,11 +7,11 @@ import br.com.samuellna.todo_api.database.repository.UserRepository;
 import br.com.samuellna.todo_api.dto.user.ResponseUserDto;
 import br.com.samuellna.todo_api.dto.user.UpdateUserDto;
 import br.com.samuellna.todo_api.dto.user.UserDto;
+import br.com.samuellna.todo_api.exceptions.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,16 +23,17 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<ResponseUserDto> findById(Long id) {
-        Optional<UserEntity> user = userRepository.findById(id);
-        if(user.isEmpty()) return Optional.empty();
+    public ResponseUserDto findById(Long id) {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+
         List<TaskEntity> tasks = taskRepository.findByUserId(id);
-        return Optional.of(new ResponseUserDto(
-            user.get().getId(),
-            user.get().getName(),
-            user.get().getEmail(),
+        return new ResponseUserDto(
+            user.getId(),
+            user.getName(),
+            user.getEmail(),
             tasks
-        ));
+        );
     }
 
     public UserEntity create(UserDto userDto) {
@@ -44,20 +45,14 @@ public class UserService {
         );
     }
 
-    public Optional<ResponseUserDto> update(Long id, UpdateUserDto userDto) {
-        // Checks if the body is empty
-        if(userDto.getEmail() == null && userDto.getName() == null) return Optional.empty();
-
-        Optional<ResponseUserDto> user = this.findById(id);
-        if(user.isEmpty()) return Optional.empty(); // The user doesn't exist in the database.
-
-        userRepository.update(id, userDto);
+    public ResponseUserDto update(Long id, UpdateUserDto userDto) {
+        ResponseUserDto user = this.findById(id);
+        userRepository.update(user.getId(), userDto);
         return this.findById(id);
     }
 
     public void delete(Long id) {
-        Optional<ResponseUserDto> user = this.findById(id);
-        if(user.isEmpty()) return; // The user doesn't exist in the database.
-        userRepository.delete(id);
+        ResponseUserDto user = this.findById(id);
+        userRepository.delete(user.getId());
     }
 }

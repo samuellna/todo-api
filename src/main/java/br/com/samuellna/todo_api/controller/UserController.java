@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
@@ -28,10 +27,8 @@ public class UserController {
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<ResponseUserDto> findById(@PathVariable("id") Long id) {
-        Optional<ResponseUserDto> user = userService.findById(id);
-        return user
-                .map(userEntity -> new ResponseEntity<>(userEntity, HttpStatus.FOUND))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        ResponseUserDto user = userService.findById(id);
+        return ResponseEntity.ok(userService.findById(id));
     }
 
     @PostMapping
@@ -45,10 +42,8 @@ public class UserController {
         @PathVariable("id") Long id,
         @RequestBody @Valid UpdateUserDto userDto
     ) {
-        Optional<ResponseUserDto> user = userService.update(id, userDto);
-        return user
-                .map(responseUserDto -> new ResponseEntity<>(responseUserDto, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        ResponseUserDto user = userService.update(id, userDto);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
