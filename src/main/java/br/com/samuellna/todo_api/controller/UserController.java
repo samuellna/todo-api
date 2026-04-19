@@ -1,8 +1,9 @@
 package br.com.samuellna.todo_api.controller;
 
 import br.com.samuellna.todo_api.database.model.UserEntity;
-import br.com.samuellna.todo_api.dto.UpdateUserDto;
-import br.com.samuellna.todo_api.dto.UserDto;
+import br.com.samuellna.todo_api.dto.user.ResponseUserDto;
+import br.com.samuellna.todo_api.dto.user.UpdateUserDto;
+import br.com.samuellna.todo_api.dto.user.UserDto;
 import br.com.samuellna.todo_api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/v1/user")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -26,8 +27,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<UserEntity> findById(@PathVariable("id") Long id) {
-        Optional<UserEntity> user = userService.findById(id);
+    public ResponseEntity<ResponseUserDto> findById(@PathVariable("id") Long id) {
+        Optional<ResponseUserDto> user = userService.findById(id);
         return user
                 .map(userEntity -> new ResponseEntity<>(userEntity, HttpStatus.FOUND))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -40,13 +41,13 @@ public class UserController {
     }
 
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<UserEntity> update(
+    public ResponseEntity<ResponseUserDto> update(
         @PathVariable("id") Long id,
         @RequestBody @Valid UpdateUserDto userDto
     ) {
-        Optional<UserEntity> user = userService.update(id, userDto);
+        Optional<ResponseUserDto> user = userService.update(id, userDto);
         return user
-                .map(userEntity -> new ResponseEntity<>(userEntity, HttpStatus.OK))
+                .map(responseUserDto -> new ResponseEntity<>(responseUserDto, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
