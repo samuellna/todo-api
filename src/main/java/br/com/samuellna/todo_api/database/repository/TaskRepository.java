@@ -1,8 +1,8 @@
 package br.com.samuellna.todo_api.database.repository;
 
 import br.com.samuellna.todo_api.database.model.TaskEntity;
-import br.com.samuellna.todo_api.dto.TaskDto;
-import br.com.samuellna.todo_api.dto.UpdateTaskDto;
+import br.com.samuellna.todo_api.dto.task.TaskDto;
+import br.com.samuellna.todo_api.dto.task.UpdateTaskDto;
 import br.com.samuellna.todo_api.utils.StatusTask;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,42 +20,60 @@ public class TaskRepository {
     private final JdbcTemplate jdbcTemplate;
 
     public List<TaskEntity> findAll() {
-        String sqlQuery = "SELECT id, title, description, status, created_at FROM tasks";
+        String sqlQuery = "SELECT id, title, description, status, created_at, user_id FROM tasks";
         return jdbcTemplate.query(sqlQuery, (rs, rowNum) ->
             new TaskEntity(
                 rs.getLong("id"),
                 rs.getString("title"),
                 rs.getString("description"),
                 StatusTask.valueOf(rs.getString("status")),
-                rs.getTimestamp("created_at")
+                rs.getTimestamp("created_at"),
+                rs.getLong("user_id")
             )
         );
     }
 
     public Long create(TaskDto task) {
-        String sqlQuery = "INSERT INTO tasks (title, description, status, created_at) VALUES (?, ?, ?, ?) RETURNING id";
+        String sqlQuery =
+                "INSERT INTO tasks (title, description, status, created_at, user_id) VALUES (?, ?, ?, ?, ?) RETURNING id";
         return jdbcTemplate.queryForObject(
             sqlQuery,
             Long.class,
             task.getTitle(),
             task.getDescription(),
-            StatusTask.NOT_STARTED.toString(),
-            Timestamp.valueOf(LocalDateTime.now())
+            StatusTask.PENDING.toString(),
+            Timestamp.valueOf(LocalDateTime.now()),
+            task.getUserId()
         );
     }
 
     public Optional<TaskEntity> findById(Long id) {
-        String sqlQuery = "SELECT id, title, description, status, created_at FROM tasks WHERE id = ?";
+        String sqlQuery = "SELECT id, title, description, status, created_at, user_id FROM tasks WHERE id = ?";
         List<TaskEntity> task = jdbcTemplate.query(sqlQuery,
             (rs, rowNum) -> new TaskEntity(
                 rs.getLong("id"),
                 rs.getString("title"),
                 rs.getString("description"),
                 StatusTask.valueOf(rs.getString("status")),
-                rs.getTimestamp("created_at")
+                rs.getTimestamp("created_at"),
+                rs.getLong("user_id")
             ),
         id);
         return task.stream().findFirst();
+    }
+
+    public List<TaskEntity> findByUserId(Long userId) {
+        String sqlQuery = "SELECT id, title, description, status, created_at, user_id FROM tasks WHERE user_id = ?";
+        return jdbcTemplate.query(sqlQuery,
+            (rs, rowNum) -> new TaskEntity(
+                rs.getLong("id"),
+                rs.getString("title"),
+                rs.getString("description"),
+                StatusTask.valueOf(rs.getString("status")),
+                rs.getTimestamp("created_at"),
+                rs.getLong("user_id")
+            ),
+        userId).stream().toList();
     }
 
     public void update(Long id, UpdateTaskDto taskDto) {
