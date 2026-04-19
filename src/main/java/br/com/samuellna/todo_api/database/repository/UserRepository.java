@@ -1,8 +1,8 @@
 package br.com.samuellna.todo_api.database.repository;
 
 import br.com.samuellna.todo_api.database.model.UserEntity;
-import br.com.samuellna.todo_api.dto.UpdateUserDto;
-import br.com.samuellna.todo_api.dto.UserDto;
+import br.com.samuellna.todo_api.dto.user.UpdateUserDto;
+import br.com.samuellna.todo_api.dto.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
