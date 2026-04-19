@@ -1,8 +1,9 @@
 package br.com.samuellna.todo_api.controller;
 
 import br.com.samuellna.todo_api.database.model.TaskEntity;
-import br.com.samuellna.todo_api.dto.TaskDto;
-import br.com.samuellna.todo_api.dto.UpdateTaskDto;
+import br.com.samuellna.todo_api.dto.task.ResponseTaskDto;
+import br.com.samuellna.todo_api.dto.task.TaskDto;
+import br.com.samuellna.todo_api.dto.task.UpdateTaskDto;
 import br.com.samuellna.todo_api.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +27,17 @@ public class TaskController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<TaskEntity> findById(@PathVariable("id") Long id) {
-        Optional<TaskEntity> task = taskService.findById(id);
+    public ResponseEntity<ResponseTaskDto> findById(@PathVariable("id") Long id) {
+        Optional<ResponseTaskDto> task = taskService.findById(id);
         return task
                 .map(t -> new ResponseEntity<>(t, HttpStatus.FOUND))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping(value = "/{userId}/user")
+    public ResponseEntity<List<TaskEntity>> findByUserId(@PathVariable("userId") Long userId) {
+        List<TaskEntity> tasks = taskService.findByUserId(userId);
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
     @PostMapping
@@ -40,9 +47,9 @@ public class TaskController {
     }
 
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<TaskEntity> update(@PathVariable("id") Long id,
+    public ResponseEntity<ResponseTaskDto> update(@PathVariable("id") Long id,
                                              @RequestBody @Valid UpdateTaskDto taskDto) {
-        Optional<TaskEntity> task = taskService.update(id, taskDto);
+        Optional<ResponseTaskDto> task = taskService.update(id, taskDto);
         return task
                 .map(t -> new ResponseEntity<>(t, HttpStatus.FOUND))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
