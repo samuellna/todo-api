@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/task")
@@ -28,10 +27,8 @@ public class TaskController {
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<ResponseTaskDto> findById(@PathVariable("id") Long id) {
-        Optional<ResponseTaskDto> task = taskService.findById(id);
-        return task
-                .map(t -> new ResponseEntity<>(t, HttpStatus.FOUND))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        ResponseTaskDto task = taskService.findById(id);
+        return new ResponseEntity<>(task, HttpStatus.FOUND);
     }
 
     @GetMapping(value = "/{userId}/user")
@@ -49,10 +46,8 @@ public class TaskController {
     @PatchMapping(value = "/{id}")
     public ResponseEntity<ResponseTaskDto> update(@PathVariable("id") Long id,
                                              @RequestBody @Valid UpdateTaskDto taskDto) {
-        Optional<ResponseTaskDto> task = taskService.update(id, taskDto);
-        return task
-                .map(t -> new ResponseEntity<>(t, HttpStatus.FOUND))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        ResponseTaskDto task = taskService.update(id, taskDto);
+        return new ResponseEntity<>(task, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
